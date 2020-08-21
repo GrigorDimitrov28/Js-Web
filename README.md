@@ -1,4 +1,4 @@
-#How to run it:
+# How to run it:
   ## npm install - to install dependencies
   ## npm run start - to launch the web server
 
