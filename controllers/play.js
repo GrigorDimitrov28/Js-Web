@@ -1,22 +1,17 @@
-const Play = require('../models/play');
-const User = require('../models/user');
+const Play = require("../models/play");
+const User = require("../models/user");
 
 const getAllPlays = async (req, res) => {
-  let plays = await Play.find().lean()
-  return plays
-}
+  let plays = await Play.find().lean();
+  return plays;
+};
 
 const postPlay = async (req, res) => {
-  const {
-    title,
-    description,
-    imageUrl,
-    isPublic,
-  } = req.body
+  const { title, description, imageUrl, isPublic } = req.body;
 
-  if(title.length == 0) return {error: 'Title cannot be empty'};
-  if(description.length == 0) return {error: 'Description cannot be empty'};
-  if(imageUrl.length == 0) return {error: 'ImageUrl cannot be empty'};
+  if (title.length == 0) return { error: "Title cannot be empty" };
+  if (description.length == 0) return { error: "Description cannot be empty" };
+  if (imageUrl.length == 0) return { error: "ImageUrl cannot be empty" };
 
   try {
     const play = new Play({
@@ -25,29 +20,28 @@ const postPlay = async (req, res) => {
       imageUrl,
       isPublic: isPublic == "on" ? true : false,
       creator: req.id,
-      createdAt: Date.now()
-    })
-
-    const playObject = await play.save().catch(err => {
-      return {
-        error: 'Invalid data'
-      }
+      createdAt: Date.now(),
     });
-    return playObject
 
+    const playObject = await play.save().catch((err) => {
+      return {
+        error: "Invalid data",
+      };
+    });
+    return playObject;
   } catch (err) {
     return {
-      error: err
+      error: err,
     };
   }
-}
+};
 
 const getPlay = async (req, res) => {
   const id = req.params.id;
 
   const play = await Play.findById(id);
   return play;
-}
+};
 
 const deletePlay = async (req, res) => {
   const id = req.params.id;
@@ -56,15 +50,10 @@ const deletePlay = async (req, res) => {
   if (req.id == play.creator) {
     await Play.deleteOne({ _id: id });
   }
-}
+};
 
 const editPlay = async (req, res) => {
-
-  const {
-    title,
-    description,
-    imageUrl,
-  } = req.body
+  const { title, description, imageUrl } = req.body;
 
   const isPublic = req.body.isPublic == "on" ? true : false;
 
@@ -72,32 +61,31 @@ const editPlay = async (req, res) => {
     const id = req.params.id;
 
     if (title) {
-      await Play.findByIdAndUpdate(id, { title: title })
+      await Play.findByIdAndUpdate(id, { title: title });
     }
     if (description) {
-      await Play.findByIdAndUpdate(id, { description: description })
+      await Play.findByIdAndUpdate(id, { description: description });
     }
     if (imageUrl) {
-      await Play.findByIdAndUpdate(id, { imageUrl: imageUrl })
+      await Play.findByIdAndUpdate(id, { imageUrl: imageUrl });
     }
     if (isPublic) {
-      await Play.findByIdAndUpdate(id, { isPublic: isPublic })
+      await Play.findByIdAndUpdate(id, { isPublic: isPublic });
     }
     return {};
   } catch (err) {
     return {
-      error: err
+      error: err,
     };
   }
-
-}
+};
 
 const likePlay = async (req, res) => {
   const id = req.params.id;
 
-  await Play.findByIdAndUpdate(id, { $addToSet: { usersLiked: req.id } })
-  await User.findByIdAndUpdate(req.id, { $addToSet: { likedPlas: id } })
-}
+  await Play.findByIdAndUpdate(id, { $addToSet: { usersLiked: req.id } });
+  await User.findByIdAndUpdate(req.id, { $addToSet: { likedPlas: id } });
+};
 
 module.exports = {
   getAllPlays,
@@ -105,5 +93,5 @@ module.exports = {
   getPlay,
   deletePlay,
   editPlay,
-  likePlay
-}
+  likePlay,
+};
